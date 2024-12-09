@@ -1,0 +1,49 @@
+.filmCatalog {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 33px;
+  column-gap: 36px;
+  justify-items: center;
+}
+
+.filmConteiner {
+  color: white;
+  width: 454px;
+  height: 281px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background-color: rgba(0, 0, 0, 0.9);
+  border-radius: 10px;
+}
+.poster_path {
+  height: 281px;
+
+  border-radius: 10px 0 0 10px;
+}
+.popularity {
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  width: 30px;
+  height: 30px;
+  font-size: 12px;
+  border: 2px solid rgb(233, 209, 0);
+  border-radius: 50%;
+}
+.title {
+  font-size: 16px;
+}
+.release_date {
+  font-size: 12px;
+}
+.overview {
+  width: 228px;
+  height: 129px;
+  overflow: hidden;
+}
+.aboutFilm div {
+  display: flex;
+  justify-content: space-between;
+  padding-right: 10px;
+  align-items: center;
+}

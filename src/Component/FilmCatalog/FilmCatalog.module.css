@@ -1,0 +1,83 @@
+.filmCatalog {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 33px;
+  column-gap: 36px;
+  justify-items: center;
+}
+
+.filmConteiner {
+  color: white;
+  width: 454px;
+  height: 281px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background-color: rgba(0, 0, 0, 0.9);
+  border-radius: 10px;
+}
+.poster_path {
+  height: 281px;
+
+  border-radius: 10px 0 0 10px;
+}
+.popularity {
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  width: 30px;
+  height: 30px;
+  font-size: 12px;
+  border-radius: 50%;
+}
+
+.popularityFrom0To3 {
+  border: 2px solid #e90000;
+}
+
+.popularityFrom3To5 {
+  border: 2px solid #e97e00;
+}
+
+.popularityFrom5To7 {
+  border: 2px solid #e9d100;
+}
+
+.popularityFrom7 {
+  border: 2px solid #66e900;
+}
+
+.title {
+  width: 200px;
+  font-size: 16px;
+}
+.release_date {
+  font-size: 12px;
+}
+.overview {
+  width: 228px;
+  padding-right: 10px;
+  overflow: hidden;
+}
+
+.aboutFilm .title_popularity {
+  display: flex;
+  justify-content: space-between;
+  padding-right: 10px;
+  align-items: center;
+}
+
+.genresContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.genreTag {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: 400;
+  color: white;
+  background-color: rgb(24, 144, 255);
+}
