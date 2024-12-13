@@ -12,7 +12,7 @@
   height: 281px;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: rgba(26, 26, 25, 0.7);
   border-radius: 10px;
 }
 .poster_path {

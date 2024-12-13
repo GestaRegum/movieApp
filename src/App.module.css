@@ -17,7 +17,7 @@
 }
 .poster_path {
   height: 281px;
-
+  width: 183px;
   border-radius: 10px 0 0 10px;
 }
 .popularity {

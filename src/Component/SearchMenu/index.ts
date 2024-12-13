@@ -1,3 +1,3 @@
-import { Search } from './Search';
+import { SearchMenu } from './Search';
 
-export { Search };
+export { SearchMenu };

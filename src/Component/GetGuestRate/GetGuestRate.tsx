@@ -1,15 +1,12 @@
 import { FC, useEffect, useState } from 'react';
-import { format } from 'date-fns';
-import { FilmType, SearchType } from 'type';
-import { Spin, Pagination, Rate, Alert } from 'antd';
-import { useDebouncedCallback } from 'use-debounce';
-import { useGenres } from '../Context';
-import { optionsApiForGet } from '../../OptionsForAPI';
+
 import classNames from 'classnames';
+import { format } from 'date-fns';
+import { Pagination, Rate, Alert, Spin } from 'antd';
+import styles from '../FilmCatalog/FilmCatalog.module.css';
+import { FilmType } from 'type';
+import { useGenres } from '../Context';
 
-import styles from './FilmCatalog.module.css';
-
-const urlMovie = 'https://api.themoviedb.org/3/search/movie';
 const urlImageMovie = 'https://image.tmdb.org/t/p/original/';
 
 function miniOverview(text: string, length = 60): string {
@@ -17,56 +14,64 @@ function miniOverview(text: string, length = 60): string {
   return text.slice(0, text.indexOf(' ', length)) + '...';
 }
 
-const FilmCatalog: FC<SearchType> = ({ query, guestSessionID }) => {
+export const GetGuestRate: FC = () => {
+  const { sessionId } = useGenres();
+  const [guestRate, setGuestRate] = useState<FilmType[]>([]);
   const { genres } = useGenres();
-  const [films, setFilms] = useState<FilmType[]>([]);
+  const [ratings, setRatings] = useState<Record<number, number>>({});
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const [pages, setPages] = useState<number>(1);
   const [targetPage, setTargetPage] = useState<number>(1);
-  const [ratings, setRatings] = useState<Record<number, number>>({});
 
-  console.log(guestSessionID);
-
-  const fetchFilms = useDebouncedCallback((query: string, cur: number) => {
-    if (query === '') {
-      setPages(1);
-      setFilms([]);
-      setTargetPage(1);
+  const MyRateMovie = async (pages: number) => {
+    if (!sessionId) {
+      console.error('sessionId отсутствует.');
       return;
     }
-    setFilms([]);
-    setSearchLoading(true);
-    fetch(`${urlMovie}?query=${query}&page=${cur}`, optionsApiForGet)
-      .then((res) => res.json())
-      .then((film) => {
-        if (film.total_results === 0) {
-          setPages(1);
-          setFilms([]);
-          setSearchLoading(false);
-          return;
-        }
 
-        setPages(film.total_results);
-        setFilms(film.results);
-        setSearchLoading(false);
-      })
-      .catch((err) => {
-        console.error('Ошибка при загрузке фильмов:', err);
-        setSearchLoading(false);
-      });
-  }, 2000);
+    const options = {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        Authorization:
+          'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4OGFlNWZiMmJmMThhZDM3YzM2MDU4ZDM4ZjAwNTYxYiIsIm5iZiI6MTczMjcxMDUwMS4zOTEsInN1YiI6IjY3NDcxMDY1MjljYTBlZWEzMDUwNzdkNCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cEK91n3NznOxH2QoYFzzvhCSepkfderr5bVzjh3KsBU',
+      },
+    };
+
+    try {
+      setSearchLoading(true);
+      const response = await fetch(
+        `https://api.themoviedb.org/3/guest_session/${sessionId}/rated/movies?language=en-US&page=${pages}&sort_by=created_at.asc`,
+        options
+      );
+      if (!response.ok) {
+        throw new Error(`Ошибка: ${response.status}`);
+      }
+      const films = await response.json();
+
+      setSearchLoading(false);
+      setGuestRate(films.results);
+      setPages(films.total_results);
+      console.log(films);
+    } catch (error) {
+      console.error('Ошибка при получении рейтинга:', error);
+    }
+  };
 
   useEffect(() => {
-    fetchFilms(query, targetPage);
+    MyRateMovie(targetPage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, targetPage, fetchFilms]);
+  }, [ratings]);
+
+  const handleToPage = (page: number) => {
+    setTargetPage(page);
+    MyRateMovie(page);
+  };
 
   const handleRateChange = (filmId: number, value: number) => {
-    console.log(value, filmId);
     if (value === 0) {
-      console.log(value, filmId);
-      const optionsDelete = {
-        method: 'DELETE',
+      const options = {
+        method: value === 0 ? 'DELETE' : 'POST',
         headers: {
           accept: 'application/json',
           'Content-Type': 'application/json;charset=utf-8',
@@ -75,26 +80,10 @@ const FilmCatalog: FC<SearchType> = ({ query, guestSessionID }) => {
         },
       };
 
-      fetch(`https://api.themoviedb.org/3/movie/${filmId}/rating?guest_session_id=${guestSessionID}`, optionsDelete)
+      fetch(`https://api.themoviedb.org/3/movie/${filmId}/rating?guest_session_id=${sessionId}`, options)
         .then((res) => res.json())
         .then((res) => console.log(res))
-        .catch((err) => console.error(err));
-    } else {
-      const optionsAdd = {
-        method: 'POST',
-        headers: {
-          accept: 'application/json',
-          'Content-Type': 'application/json;charset=utf-8',
-          Authorization:
-            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4OGFlNWZiMmJmMThhZDM3YzM2MDU4ZDM4ZjAwNTYxYiIsIm5iZiI6MTczMjcxMDUwMS4zOTEsInN1YiI6IjY3NDcxMDY1MjljYTBlZWEzMDUwNzdkNCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cEK91n3NznOxH2QoYFzzvhCSepkfderr5bVzjh3KsBU',
-        },
-        body: `{"value":${value.toString()}}`,
-      };
-
-      fetch(`https://api.themoviedb.org/3/movie/${filmId}/rating?guest_session_id=${guestSessionID}`, optionsAdd)
-        .then((res) => res.json())
-        .then((res) => console.log(res))
-        .catch((err) => console.error(err));
+        .catch((err) => <Alert message={err} />);
     }
 
     setRatings((prev) => ({
@@ -103,13 +92,13 @@ const FilmCatalog: FC<SearchType> = ({ query, guestSessionID }) => {
     }));
   };
 
-  const handleToPage = (page: number) => {
-    setTargetPage(page);
-    fetchFilms(query, page);
-  };
+  if (guestRate.length === 0) {
+    return <Alert />;
+  }
 
-  const filmCatalog = films.map((film) => {
+  const myRatesFilms = guestRate.map((film) => {
     const filmGenres = film.genre_ids.map((id) => genres.find((genre) => genre.id === id)?.name).filter((name) => name);
+
     return (
       <>
         <div className={styles.filmConteiner} key={film.id}>
@@ -145,7 +134,7 @@ const FilmCatalog: FC<SearchType> = ({ query, guestSessionID }) => {
               style={{ fontSize: 15 }}
               count={10}
               allowHalf
-              value={ratings[film.id] || 0}
+              value={film.rating}
               onChange={(value) => handleRateChange(film.id, value)}
             />
           </div>
@@ -157,12 +146,10 @@ const FilmCatalog: FC<SearchType> = ({ query, guestSessionID }) => {
   return (
     <>
       <div className={styles.filmCatalog}>
-        {filmCatalog.length > 0 ? filmCatalog : <Alert message="Фильм не найден" />}
+        {guestRate.length > 0 ? myRatesFilms : <Alert message="Фильм не найден" />}
       </div>
-
       {searchLoading ? <Spin /> : null}
-
-      {filmCatalog.length === 0 ? null : (
+      {myRatesFilms.length === 0 ? null : (
         <Pagination
           current={targetPage}
           onChange={handleToPage}
@@ -176,5 +163,3 @@ const FilmCatalog: FC<SearchType> = ({ query, guestSessionID }) => {
     </>
   );
 };
-
-export { FilmCatalog };

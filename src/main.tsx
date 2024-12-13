@@ -1,13 +1,17 @@
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { GenresProvider } from './Component/GenresContext';
-import './index.css';
+import { Header } from './Component/Header/Header';
+import { BrowserRouter } from 'react-router-dom';
+import { GenresProvider } from './Component/Context';
 import { App } from './App';
 
+import './index.css';
+
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  <BrowserRouter>
+    <Header />
+
     <GenresProvider>
       <App />
     </GenresProvider>
-  </StrictMode>
+  </BrowserRouter>
 );

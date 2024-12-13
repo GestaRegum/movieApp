@@ -6,8 +6,10 @@ export interface FilmType {
   release_date: Date | number;
   vote_average: number;
   genre_ids: number[];
+  rating?: number;
 }
 
 export interface SearchType {
+  guestSessionID: string;
   query: string;
 }

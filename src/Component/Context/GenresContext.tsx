@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, FC } from 'react';
-import { optionsForAPI } from '../../OptionsForAPI';
+import { optionsApiForGet } from '../../OptionsForAPI';
+
+const urlGenres = 'https://api.themoviedb.org/3/genre/movie/list?language=en';
 
 interface State {
   id: number;
@@ -8,17 +10,20 @@ interface State {
 
 interface Props {
   genres: State[];
+  sessionId: string | null;
+  setSessionId: (id: string) => void;
 }
 
 const GenresContext = createContext<Props | undefined>(undefined);
 
 const GenresProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const [genres, setGenres] = useState<State[]>([]);
+  const [sessionId, setSessionId] = useState<string>('');
 
   useEffect(() => {
     const fetchGenres = async () => {
       try {
-        const response = await fetch('https://api.themoviedb.org/3/genre/movie/list?language=en', optionsForAPI);
+        const response = await fetch(urlGenres, optionsApiForGet);
         const data = await response.json();
         setGenres(data.genres);
       } catch (error) {
@@ -29,7 +34,7 @@ const GenresProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     fetchGenres();
   }, []);
 
-  return <GenresContext.Provider value={{ genres }}>{children}</GenresContext.Provider>;
+  return <GenresContext.Provider value={{ genres, sessionId, setSessionId }}>{children}</GenresContext.Provider>;
 };
 
 const useGenres = () => {
