@@ -23,6 +23,31 @@ export const GetGuestRate: FC = () => {
   const [pages, setPages] = useState<number>(1);
   const [targetPage, setTargetPage] = useState<number>(1);
 
+  const handleRateChange = (filmId: number, value: number) => {
+    const options = {
+      method: value === 0 ? 'DELETE' : 'POST',
+      headers: {
+        accept: 'application/json',
+        'Content-Type': 'application/json;charset=utf-8',
+        Authorization:
+          'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4OGFlNWZiMmJmMThhZDM3YzM2MDU4ZDM4ZjAwNTYxYiIsIm5iZiI6MTczMjcxMDUwMS4zOTEsInN1YiI6IjY3NDcxMDY1MjljYTBlZWEzMDUwNzdkNCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cEK91n3NznOxH2QoYFzzvhCSepkfderr5bVzjh3KsBU',
+        ...(value !== 0 ? { body: JSON.stringify({ value }) } : null),
+      },
+    };
+
+    fetch(`https://api.themoviedb.org/3/movie/${filmId}/rating?guest_session_id=${sessionId}`, options)
+      .then((res) => res.json())
+      .then((res) => console.log(res))
+      .catch((err) => <Alert message={err} />);
+
+    setRatings((prev) => ({
+      ...prev,
+      [filmId]: value,
+    }));
+
+    MyRateMovie(targetPage);
+  };
+
   const MyRateMovie = async (pages: number) => {
     if (!sessionId) {
       console.error('sessionId отсутствует.');
@@ -68,32 +93,8 @@ export const GetGuestRate: FC = () => {
     MyRateMovie(page);
   };
 
-  const handleRateChange = (filmId: number, value: number) => {
-    if (value === 0) {
-      const options = {
-        method: value === 0 ? 'DELETE' : 'POST',
-        headers: {
-          accept: 'application/json',
-          'Content-Type': 'application/json;charset=utf-8',
-          Authorization:
-            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4OGFlNWZiMmJmMThhZDM3YzM2MDU4ZDM4ZjAwNTYxYiIsIm5iZiI6MTczMjcxMDUwMS4zOTEsInN1YiI6IjY3NDcxMDY1MjljYTBlZWEzMDUwNzdkNCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cEK91n3NznOxH2QoYFzzvhCSepkfderr5bVzjh3KsBU',
-        },
-      };
-
-      fetch(`https://api.themoviedb.org/3/movie/${filmId}/rating?guest_session_id=${sessionId}`, options)
-        .then((res) => res.json())
-        .then((res) => console.log(res))
-        .catch((err) => <Alert message={err} />);
-    }
-
-    setRatings((prev) => ({
-      ...prev,
-      [filmId]: value,
-    }));
-  };
-
   if (guestRate.length === 0) {
-    return <Alert />;
+    return <Alert message={'нет данных. так как гостевая сессия не загрузилась'} />;
   }
 
   const myRatesFilms = guestRate.map((film) => {

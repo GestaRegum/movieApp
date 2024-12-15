@@ -4,4 +4,10 @@
   margin: 0 auto;
   font-weight: 400;
   display: grid;
+  text-align: center;
+  gap: 10px;
+}
+input {
+  margin-top: 10px;
+  margin-bottom: 20px;
 }

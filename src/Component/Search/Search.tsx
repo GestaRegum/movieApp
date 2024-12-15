@@ -1,8 +1,8 @@
 import { FC, useState } from 'react';
-import { FilmCatalog } from './Component/FilmCatalog';
-import { SearchMenu } from './Component/SearchMenu';
-import { ErrorBoundary } from './Component/ErrorBoundary';
-import { GuestAPI } from './Component/GuestAPI/GuestAPI';
+import { FilmCatalog } from '../FilmCatalog';
+import { SearchMenu } from '../SearchInput';
+import { ErrorBoundary } from '../ErrorBoundary';
+import { GuestAPI } from '../GuestAPI/GuestAPI';
 
 const Search: FC = () => {
   const [query, setQuery] = useState<string>('');

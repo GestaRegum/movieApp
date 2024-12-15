@@ -17,15 +17,14 @@ function miniOverview(text: string, length = 60): string {
   return text.slice(0, text.indexOf(' ', length)) + '...';
 }
 
-const FilmCatalog: FC<SearchType> = ({ query, guestSessionID }) => {
-  const { genres } = useGenres();
+const FilmCatalog: FC<SearchType> = ({ query }) => {
+  const { genres, sessionId } = useGenres();
   const [films, setFilms] = useState<FilmType[]>([]);
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const [pages, setPages] = useState<number>(1);
   const [targetPage, setTargetPage] = useState<number>(1);
   const [ratings, setRatings] = useState<Record<number, number>>({});
-
-  console.log(guestSessionID);
+  const [hasFilms, setHasFilms] = useState<boolean>(true);
 
   const fetchFilms = useDebouncedCallback((query: string, cur: number) => {
     if (query === '') {
@@ -34,8 +33,10 @@ const FilmCatalog: FC<SearchType> = ({ query, guestSessionID }) => {
       setTargetPage(1);
       return;
     }
+
     setFilms([]);
     setSearchLoading(true);
+
     fetch(`${urlMovie}?query=${query}&page=${cur}`, optionsApiForGet)
       .then((res) => res.json())
       .then((film) => {
@@ -43,11 +44,13 @@ const FilmCatalog: FC<SearchType> = ({ query, guestSessionID }) => {
           setPages(1);
           setFilms([]);
           setSearchLoading(false);
+          setHasFilms(false);
           return;
         }
-
+        setHasFilms(true);
         setPages(film.total_results);
         setFilms(film.results);
+        console.log(film.results);
         setSearchLoading(false);
       })
       .catch((err) => {
@@ -62,40 +65,22 @@ const FilmCatalog: FC<SearchType> = ({ query, guestSessionID }) => {
   }, [query, targetPage, fetchFilms]);
 
   const handleRateChange = (filmId: number, value: number) => {
-    console.log(value, filmId);
-    if (value === 0) {
-      console.log(value, filmId);
-      const optionsDelete = {
-        method: 'DELETE',
-        headers: {
-          accept: 'application/json',
-          'Content-Type': 'application/json;charset=utf-8',
-          Authorization:
-            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4OGFlNWZiMmJmMThhZDM3YzM2MDU4ZDM4ZjAwNTYxYiIsIm5iZiI6MTczMjcxMDUwMS4zOTEsInN1YiI6IjY3NDcxMDY1MjljYTBlZWEzMDUwNzdkNCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cEK91n3NznOxH2QoYFzzvhCSepkfderr5bVzjh3KsBU',
-        },
-      };
+    const options = {
+      method: value === 0 ? 'DELETE' : 'POST',
+      headers: {
+        accept: 'application/json',
+        'Content-Type': 'application/json;charset=utf-8',
+        Authorization:
+          'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4OGFlNWZiMmJmMThhZDM3YzM2MDU4ZDM4ZjAwNTYxYiIsIm5iZiI6MTczMjcxMDUwMS4zOTEsInN1YiI6IjY3NDcxMDY1MjljYTBlZWEzMDUwNzdkNCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cEK91n3NznOxH2QoYFzzvhCSepkfderr5bVzjh3KsBU',
+      },
 
-      fetch(`https://api.themoviedb.org/3/movie/${filmId}/rating?guest_session_id=${guestSessionID}`, optionsDelete)
-        .then((res) => res.json())
-        .then((res) => console.log(res))
-        .catch((err) => console.error(err));
-    } else {
-      const optionsAdd = {
-        method: 'POST',
-        headers: {
-          accept: 'application/json',
-          'Content-Type': 'application/json;charset=utf-8',
-          Authorization:
-            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4OGFlNWZiMmJmMThhZDM3YzM2MDU4ZDM4ZjAwNTYxYiIsIm5iZiI6MTczMjcxMDUwMS4zOTEsInN1YiI6IjY3NDcxMDY1MjljYTBlZWEzMDUwNzdkNCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cEK91n3NznOxH2QoYFzzvhCSepkfderr5bVzjh3KsBU',
-        },
-        body: `{"value":${value.toString()}}`,
-      };
+      ...(value !== 0 ? { body: JSON.stringify({ value }) } : null),
+    };
 
-      fetch(`https://api.themoviedb.org/3/movie/${filmId}/rating?guest_session_id=${guestSessionID}`, optionsAdd)
-        .then((res) => res.json())
-        .then((res) => console.log(res))
-        .catch((err) => console.error(err));
-    }
+    fetch(`https://api.themoviedb.org/3/movie/${filmId}/rating?guest_session_id=${sessionId}`, options)
+      .then((res) => res.json())
+      .then((res) => console.log(res))
+      .catch((err) => console.error(err));
 
     setRatings((prev) => ({
       ...prev,
@@ -140,14 +125,17 @@ const FilmCatalog: FC<SearchType> = ({ query, guestSessionID }) => {
               ))}
             </div>
             <p className={classNames(styles.overview)}>{miniOverview(film.overview)}</p>
-
-            <Rate
-              style={{ fontSize: 15 }}
-              count={10}
-              allowHalf
-              value={ratings[film.id] || 0}
-              onChange={(value) => handleRateChange(film.id, value)}
-            />
+            <div>
+              <div className={classNames(styles.rate)}>
+                <Rate
+                  style={{ fontSize: 15 }}
+                  count={10}
+                  allowHalf
+                  value={ratings[film.id] || 0}
+                  onChange={(value) => handleRateChange(film.id, value)}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </>
@@ -156,9 +144,7 @@ const FilmCatalog: FC<SearchType> = ({ query, guestSessionID }) => {
 
   return (
     <>
-      <div className={styles.filmCatalog}>
-        {filmCatalog.length > 0 ? filmCatalog : <Alert message="Фильм не найден" />}
-      </div>
+      <div className={styles.filmCatalog}>{hasFilms ? filmCatalog : <Alert message="Фильм не найден" />}</div>
 
       {searchLoading ? <Spin /> : null}
 
