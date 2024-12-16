@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { FilmType, SearchType } from 'type';
-import { Spin, Pagination, Rate, Alert } from 'antd';
+import { Spin, Pagination, Rate, Alert, ConfigProvider } from 'antd';
 import { useDebouncedCallback } from 'use-debounce';
 import { useGenres } from '../Context';
 import { optionsApiForGet } from '../../OptionsForAPI';
@@ -31,6 +31,7 @@ const FilmCatalog: FC<SearchType> = ({ query }) => {
       setPages(1);
       setFilms([]);
       setTargetPage(1);
+      setSearchLoading(false);
       return;
     }
 
@@ -50,7 +51,6 @@ const FilmCatalog: FC<SearchType> = ({ query }) => {
         setHasFilms(true);
         setPages(film.total_results);
         setFilms(film.results);
-        console.log(film.results);
         setSearchLoading(false);
       })
       .catch((err) => {
@@ -79,7 +79,6 @@ const FilmCatalog: FC<SearchType> = ({ query }) => {
 
     fetch(`https://api.themoviedb.org/3/movie/${filmId}/rating?guest_session_id=${sessionId}`, options)
       .then((res) => res.json())
-      .then((res) => console.log(res))
       .catch((err) => console.error(err));
 
     setRatings((prev) => ({
@@ -97,9 +96,14 @@ const FilmCatalog: FC<SearchType> = ({ query }) => {
     const filmGenres = film.genre_ids.map((id) => genres.find((genre) => genre.id === id)?.name).filter((name) => name);
     return (
       <>
-        <div className={styles.filmConteiner} key={film.id}>
-          <img className={styles.poster_path} src={`${urlImageMovie}${film.poster_path}`} alt={film.title} />
-          <div className={styles.aboutFilm}>
+        {' '}
+        <div className={classNames(styles.filmConteiner)} key={film.id}>
+          <img
+            className={classNames(styles.poster_path)}
+            src={`${urlImageMovie}${film.poster_path}`}
+            alt={film.title}
+          />
+          <div className={classNames(styles.aboutFilm)}>
             <div className={classNames(styles.title_popularity)}>
               <p className={classNames(styles.title)}>{film.title}</p>
               <p
@@ -125,16 +129,14 @@ const FilmCatalog: FC<SearchType> = ({ query }) => {
               ))}
             </div>
             <p className={classNames(styles.overview)}>{miniOverview(film.overview)}</p>
-            <div>
-              <div className={classNames(styles.rate)}>
-                <Rate
-                  style={{ fontSize: 15 }}
-                  count={10}
-                  allowHalf
-                  value={ratings[film.id] || 0}
-                  onChange={(value) => handleRateChange(film.id, value)}
-                />
-              </div>
+            <div className={classNames(styles.rate)}>
+              <Rate
+                className={classNames(styles.customRate)}
+                count={10}
+                allowHalf
+                value={ratings[film.id] || 0}
+                onChange={(value) => handleRateChange(film.id, value)}
+              />
             </div>
           </div>
         </div>
@@ -144,21 +146,35 @@ const FilmCatalog: FC<SearchType> = ({ query }) => {
 
   return (
     <>
-      <div className={styles.filmCatalog}>{hasFilms ? filmCatalog : <Alert message="Фильм не найден" />}</div>
+      {' '}
+      <ConfigProvider
+        theme={{
+          token: {
+            colorBgTextHover: 'rgb(24, 144, 255)',
+            colorBgContainer: 'rgb(51, 51, 60);',
+            colorText: 'rgb(255, 255, 255)',
+            colorTextDisabled: 'rgba(255, 255, 255, 0.35)',
+            colorPrimary: 'rgb(255, 255, 255)',
+          },
+        }}
+      >
+        <div className={styles.filmCatalog}>{hasFilms ? filmCatalog : <Alert message="Фильм не найден" />}</div>
 
-      {searchLoading ? <Spin /> : null}
+        {searchLoading ? <Spin size="large" /> : null}
 
-      {filmCatalog.length === 0 ? null : (
-        <Pagination
-          current={targetPage}
-          onChange={handleToPage}
-          defaultPageSize={20}
-          align="center"
-          showSizeChanger={false}
-          defaultCurrent={1}
-          total={pages}
-        />
-      )}
+        {filmCatalog.length === 0 ? null : (
+          <Pagination
+            style={{ marginTop: 24 }}
+            current={targetPage}
+            onChange={handleToPage}
+            defaultPageSize={20}
+            align="center"
+            showSizeChanger={false}
+            defaultCurrent={1}
+            total={pages}
+          />
+        )}
+      </ConfigProvider>
     </>
   );
 };

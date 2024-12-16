@@ -1,5 +1,8 @@
 import { FC, ChangeEvent, useCallback } from 'react';
 
+import styles from './SearchInput.module.css';
+import classNames from 'classnames';
+
 interface SearchProps {
   onSearch: (text: string) => void;
 }
@@ -12,7 +15,7 @@ const SearchMenu: FC<SearchProps> = ({ onSearch }) => {
     [onSearch]
   );
 
-  return <input type="text" onChange={handleChange} placeholder="Введите текст поиска" />;
+  return <input className={classNames(styles)} type="text" onChange={handleChange} placeholder="Type to search..." />;
 };
 
 export { SearchMenu };

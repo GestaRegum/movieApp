@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 
 import classNames from 'classnames';
 import { format } from 'date-fns';
-import { Pagination, Rate, Alert, Spin } from 'antd';
+import { Pagination, Rate, Alert, Spin, ConfigProvider } from 'antd';
 import styles from '../FilmCatalog/FilmCatalog.module.css';
 import { FilmType } from 'type';
 import { useGenres } from '../Context';
@@ -77,7 +77,6 @@ export const GetGuestRate: FC = () => {
       setSearchLoading(false);
       setGuestRate(films.results);
       setPages(films.total_results);
-      console.log(films);
     } catch (error) {
       console.error('Ошибка при получении рейтинга:', error);
     }
@@ -146,21 +145,33 @@ export const GetGuestRate: FC = () => {
 
   return (
     <>
-      <div className={styles.filmCatalog}>
-        {guestRate.length > 0 ? myRatesFilms : <Alert message="Фильм не найден" />}
-      </div>
-      {searchLoading ? <Spin /> : null}
-      {myRatesFilms.length === 0 ? null : (
-        <Pagination
-          current={targetPage}
-          onChange={handleToPage}
-          defaultPageSize={20}
-          align="center"
-          showSizeChanger={false}
-          defaultCurrent={1}
-          total={pages}
-        />
-      )}
+      <ConfigProvider
+        theme={{
+          token: {
+            colorBgTextHover: 'rgb(24, 144, 255)',
+            colorBgContainer: 'rgb(51, 51, 60);',
+            colorText: 'rgb(255, 255, 255)',
+            colorTextDisabled: 'rgba(255, 255, 255, 0.35)',
+            colorPrimary: 'rgb(255, 255, 255)',
+          },
+        }}
+      >
+        <div className={styles.filmCatalog}>
+          {guestRate.length > 0 ? myRatesFilms : <Alert message="Фильм не найден" />}
+        </div>
+        {searchLoading ? <Spin /> : null}
+        {myRatesFilms.length === 0 ? null : (
+          <Pagination
+            current={targetPage}
+            onChange={handleToPage}
+            defaultPageSize={20}
+            align="center"
+            showSizeChanger={false}
+            defaultCurrent={1}
+            total={pages}
+          />
+        )}
+      </ConfigProvider>
     </>
   );
 };

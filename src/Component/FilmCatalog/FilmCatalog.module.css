@@ -50,6 +50,7 @@
   .title {
     width: 200px;
     font-size: 16px;
+    text-align: left;
   }
   .release_date {
     font-size: 12px;
@@ -58,6 +59,12 @@
     width: 228px;
     padding-right: 10px;
     overflow: hidden;
+    text-align: left;
+  }
+
+  .aboutFilm {
+    display: grid;
+    justify-items: start;
   }
 
   .aboutFilm .title_popularity {
@@ -71,6 +78,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    align-content: center;
   }
 
   .genreTag {
@@ -81,6 +89,10 @@
     font-weight: 400;
     color: white;
     background-color: rgb(24, 144, 255);
+  }
+
+  .customRate {
+    font-size: 15px;
   }
 }
 
@@ -135,6 +147,7 @@
   .title {
     margin: 0;
     font-size: 20px;
+    text-align: left;
   }
   .release_date {
     margin: 0;
@@ -145,7 +158,7 @@
     padding-top: 19px;
     padding-right: 10px;
     margin: 0;
-    font-weight: 12px;
+    font-size: 12px;
     text-align: left;
   }
 

@@ -1,4 +1,5 @@
 :root {
+  background-color: rgb(51, 51, 60);
   font-family: Roboto;
   max-width: 938px;
   margin: 0 auto;
@@ -7,7 +8,7 @@
   text-align: center;
   gap: 10px;
 }
-input {
-  margin-top: 10px;
-  margin-bottom: 20px;
+:where(.css-dev-only-do-not-override-1c374ye).ant-rate .ant-rate-star-first,
+:where(.css-dev-only-do-not-override-1c374ye).ant-rate .ant-rate-star-second {
+  color: rgba(255, 255, 255, 0.5);
 }
