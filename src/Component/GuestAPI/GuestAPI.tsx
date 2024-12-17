@@ -11,26 +11,22 @@ interface State {
   expires_at: string;
 }
 
-interface Props {
-  onGetGuestSessionId: (id: string) => void;
-}
-
-export const GuestAPI = ({ onGetGuestSessionId }: Props) => {
+export const GuestAPI = () => {
   const { sessionId, setSessionId } = useGenres();
 
   const getGuestSessionId = async (): Promise<void> => {
-    if (sessionId) return;
+    if (sessionId || sessionStorage.getItem('sessionId')) return;
 
     try {
       const response = await fetch(guestSessionUrl, optionsApiForGet);
       if (!response.ok) {
-        throw new Error(`Error Status: ${response.status}`);
+        throw new Error(`Ошибка: ${response.status}`);
       }
       const data: State = await response.json();
 
       if (data.success) {
         setSessionId(data.guest_session_id);
-        onGetGuestSessionId(data.guest_session_id);
+        sessionStorage.setItem('sessionId', data.guest_session_id);
       } else {
         throw new Error('Ошибка при загрузке гостевой сессии');
       }
@@ -40,7 +36,12 @@ export const GuestAPI = ({ onGetGuestSessionId }: Props) => {
   };
 
   useEffect(() => {
-    getGuestSessionId();
+    const storedSessionId = sessionStorage.getItem('sessionId');
+    if (storedSessionId) {
+      setSessionId(storedSessionId);
+    } else {
+      getGuestSessionId();
+    }
   }, []);
 
   return null;

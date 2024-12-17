@@ -1,4 +1,5 @@
 import { FC, useEffect, useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 
 import classNames from 'classnames';
 import { format } from 'date-fns';
@@ -15,45 +16,63 @@ function miniOverview(text: string, length = 60): string {
 }
 
 export const GetGuestRate: FC = () => {
-  const { sessionId } = useGenres();
-  const [guestRate, setGuestRate] = useState<FilmType[]>([]);
   const { genres } = useGenres();
+  const [guestRate, setGuestRate] = useState<FilmType[]>([]);
   const [ratings, setRatings] = useState<Record<number, number>>({});
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const [pages, setPages] = useState<number>(1);
   const [targetPage, setTargetPage] = useState<number>(1);
 
-  const handleRateChange = (filmId: number, value: number) => {
-    const options = {
-      method: value === 0 ? 'DELETE' : 'POST',
+  const sessionId = sessionStorage.getItem('sessionId');
+  const handleRateChange = async (filmId: number, value: number) => {
+    const isDeleting = value === 0;
+    const method = isDeleting ? 'DELETE' : 'POST';
+    const url = `https://api.themoviedb.org/3/movie/${filmId}/rating?guest_session_id=${sessionId}`;
+
+    const options: RequestInit = {
+      method,
       headers: {
         accept: 'application/json',
         'Content-Type': 'application/json;charset=utf-8',
         Authorization:
           'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4OGFlNWZiMmJmMThhZDM3YzM2MDU4ZDM4ZjAwNTYxYiIsIm5iZiI6MTczMjcxMDUwMS4zOTEsInN1YiI6IjY3NDcxMDY1MjljYTBlZWEzMDUwNzdkNCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cEK91n3NznOxH2QoYFzzvhCSepkfderr5bVzjh3KsBU',
-        ...(value !== 0 ? { body: JSON.stringify({ value }) } : null),
       },
+      ...(isDeleting ? {} : { body: JSON.stringify({ value }) }),
     };
-
-    fetch(`https://api.themoviedb.org/3/movie/${filmId}/rating?guest_session_id=${sessionId}`, options)
-      .then((res) => res.json())
-      .then((res) => console.log(res))
-      .catch((err) => <Alert message={err} />);
 
     setRatings((prev) => ({
       ...prev,
       [filmId]: value,
     }));
 
-    MyRateMovie(targetPage);
+    try {
+      const response = await fetch(url, options);
+      const result = await response.json();
+
+      if (response.ok) {
+        console.log('Рейтинг успешно обновлен:', result);
+
+        
+        await MyRateMovie(targetPage); 
+      } else {
+        console.error('Ошибка при обновлении рейтинга:', result.status_message);
+      
+        setRatings((prev) => ({
+          ...prev,
+          [filmId]: 0,
+        }));
+      }
+    } catch (err) {
+      console.error('Ошибка при выполнении запроса:', err);
+   
+      setRatings((prev) => ({
+        ...prev,
+        [filmId]: 0,
+      }));
+    }
   };
 
-  const MyRateMovie = async (pages: number) => {
-    if (!sessionId) {
-      console.error('sessionId отсутствует.');
-      return;
-    }
-
+  const MyRateMovie = useDebouncedCallback(async (page: number) => {
     const options = {
       method: 'GET',
       headers: {
@@ -66,26 +85,34 @@ export const GetGuestRate: FC = () => {
     try {
       setSearchLoading(true);
       const response = await fetch(
-        `https://api.themoviedb.org/3/guest_session/${sessionId}/rated/movies?language=en-US&page=${pages}&sort_by=created_at.asc`,
+        `https://api.themoviedb.org/3/guest_session/${sessionId}/rated/movies?language=en-US&page=${page}&sort_by=created_at.asc`,
         options
       );
+
       if (!response.ok) {
         throw new Error(`Ошибка: ${response.status}`);
       }
+
       const films = await response.json();
 
-      setSearchLoading(false);
-      setGuestRate(films.results);
+      setGuestRate(
+        films.results.map((film: FilmType) => ({
+          ...film,
+          rating: ratings[film.id] || film.rating || 0,
+        }))
+      );
       setPages(films.total_results);
     } catch (error) {
-      console.error('Ошибка при получении рейтинга:', error);
+      console.error('Ошибка при получении фильмов:', error);
+    } finally {
+      setSearchLoading(false);
     }
-  };
+  }, 1000);
 
   useEffect(() => {
     MyRateMovie(targetPage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ratings]);
+  }, [targetPage]);
 
   const handleToPage = (page: number) => {
     setTargetPage(page);
@@ -145,22 +172,20 @@ export const GetGuestRate: FC = () => {
 
   return (
     <>
-      <ConfigProvider
-        theme={{
-          token: {
-            colorBgTextHover: 'rgb(24, 144, 255)',
-            colorBgContainer: 'rgb(51, 51, 60);',
-            colorText: 'rgb(255, 255, 255)',
-            colorTextDisabled: 'rgba(255, 255, 255, 0.35)',
-            colorPrimary: 'rgb(255, 255, 255)',
-          },
-        }}
-      >
-        <div className={styles.filmCatalog}>
-          {guestRate.length > 0 ? myRatesFilms : <Alert message="Фильм не найден" />}
-        </div>
-        {searchLoading ? <Spin /> : null}
-        {myRatesFilms.length === 0 ? null : (
+      <div className={styles.filmCatalog}>{guestRate.length > 0 ? myRatesFilms : null}</div>
+      {searchLoading ? <Spin /> : null}
+      {myRatesFilms.length === 0 ? null : (
+        <ConfigProvider
+          theme={{
+            token: {
+              colorBgTextHover: 'rgb(24, 144, 255)',
+              colorBgContainer: 'rgb(51, 51, 60);',
+              colorText: 'rgb(255, 255, 255)',
+              colorTextDisabled: 'rgba(255, 255, 255, 0.35)',
+              colorPrimary: 'rgb(255, 255, 255)',
+            },
+          }}
+        >
           <Pagination
             current={targetPage}
             onChange={handleToPage}
@@ -170,8 +195,8 @@ export const GetGuestRate: FC = () => {
             defaultCurrent={1}
             total={pages}
           />
-        )}
-      </ConfigProvider>
+        </ConfigProvider>
+      )}
     </>
   );
 };

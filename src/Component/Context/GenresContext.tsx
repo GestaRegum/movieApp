@@ -20,17 +20,16 @@ const GenresProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const [genres, setGenres] = useState<State[]>([]);
   const [sessionId, setSessionId] = useState<string>('');
 
+  const fetchGenres = async () => {
+    try {
+      const response = await fetch(urlGenres, optionsApiForGet);
+      const data = await response.json();
+      setGenres(data.genres);
+    } catch (error) {
+      console.error('ошибка загрузки:', error);
+    }
+  };
   useEffect(() => {
-    const fetchGenres = async () => {
-      try {
-        const response = await fetch(urlGenres, optionsApiForGet);
-        const data = await response.json();
-        setGenres(data.genres);
-      } catch (error) {
-        console.error('Failed to fetch genres:', error);
-      }
-    };
-
     fetchGenres();
   }, []);
 

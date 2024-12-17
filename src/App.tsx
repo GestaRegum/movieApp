@@ -1,14 +1,16 @@
 import { FC } from 'react';
-import { Search } from './Component/Search/Search';
+import { Search } from './Component/Search';
 import { ErrorBoundary } from './Component/ErrorBoundary';
-import { GetGuestRate } from './Component/GetGuestRate/GetGuestRate';
+import { GetGuestRate } from './Component/GetGuestRate';
 import { Route, Routes } from 'react-router-dom';
-import { NetWork } from './Component/NetWork/NetWork';
+import { NetWork } from './Component/NetWork';
+import { GuestAPI } from './Component/GuestAPI';
 
 const App: FC = () => {
   return (
     <>
       <ErrorBoundary>
+        <GuestAPI />
         <NetWork />
         <Routes>
           <Route path="/rates" element={<GetGuestRate />} />

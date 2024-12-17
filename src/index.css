@@ -8,7 +8,7 @@
   text-align: center;
 }
 
-:where(.css-1c374ye).ant-rate .ant-rate-star-first,
-:where(.css-1c374ye).ant-rate .ant-rate-star-second {
+.ant-rate .ant-rate-star-first,
+.ant-rate .ant-rate-star-second {
   color: rgba(255, 255, 255, 0.5);
 }

@@ -10,6 +10,5 @@ export interface FilmType {
 }
 
 export interface SearchType {
-  guestSessionID: string;
   query: string;
 }

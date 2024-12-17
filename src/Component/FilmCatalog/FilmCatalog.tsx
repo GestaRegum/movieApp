@@ -18,13 +18,14 @@ function miniOverview(text: string, length = 60): string {
 }
 
 const FilmCatalog: FC<SearchType> = ({ query }) => {
-  const { genres, sessionId } = useGenres();
+  const { genres } = useGenres();
   const [films, setFilms] = useState<FilmType[]>([]);
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const [pages, setPages] = useState<number>(1);
   const [targetPage, setTargetPage] = useState<number>(1);
   const [ratings, setRatings] = useState<Record<number, number>>({});
   const [hasFilms, setHasFilms] = useState<boolean>(true);
+  const sessionId = sessionStorage.getItem('sessionId');
 
   const fetchFilms = useDebouncedCallback((query: string, cur: number) => {
     if (query === '') {
@@ -96,7 +97,6 @@ const FilmCatalog: FC<SearchType> = ({ query }) => {
     const filmGenres = film.genre_ids.map((id) => genres.find((genre) => genre.id === id)?.name).filter((name) => name);
     return (
       <>
-        {' '}
         <div className={classNames(styles.filmConteiner)} key={film.id}>
           <img
             className={classNames(styles.poster_path)}
@@ -146,23 +146,23 @@ const FilmCatalog: FC<SearchType> = ({ query }) => {
 
   return (
     <>
-      {' '}
-      <ConfigProvider
-        theme={{
-          token: {
-            colorBgTextHover: 'rgb(24, 144, 255)',
-            colorBgContainer: 'rgb(51, 51, 60);',
-            colorText: 'rgb(255, 255, 255)',
-            colorTextDisabled: 'rgba(255, 255, 255, 0.35)',
-            colorPrimary: 'rgb(255, 255, 255)',
-          },
-        }}
-      >
-        <div className={styles.filmCatalog}>{hasFilms ? filmCatalog : <Alert message="Фильм не найден" />}</div>
+      {!hasFilms ? <Alert message="Такой фильм еще не сняли :(" /> : null}
+      <div className={styles.filmCatalog}>{hasFilms ? filmCatalog : null}</div>
 
-        {searchLoading ? <Spin size="large" /> : null}
+      {searchLoading ? <Spin size="large" /> : null}
 
-        {filmCatalog.length === 0 ? null : (
+      {filmCatalog.length === 0 ? null : (
+        <ConfigProvider
+          theme={{
+            token: {
+              colorBgTextHover: 'rgb(24, 144, 255)',
+              colorBgContainer: 'rgb(51, 51, 60);',
+              colorText: 'rgb(255, 255, 255)',
+              colorTextDisabled: 'rgba(255, 255, 255, 0.35)',
+              colorPrimary: 'rgb(255, 255, 255)',
+            },
+          }}
+        >
           <Pagination
             style={{ marginTop: 24 }}
             current={targetPage}
@@ -173,8 +173,8 @@ const FilmCatalog: FC<SearchType> = ({ query }) => {
             defaultCurrent={1}
             total={pages}
           />
-        )}
-      </ConfigProvider>
+        </ConfigProvider>
+      )}
     </>
   );
 };
