@@ -14,7 +14,7 @@ interface Props {
   setSessionId: (id: string) => void;
 }
 
-const GenresContext = createContext<Props | undefined>(undefined);
+const Context = createContext<Props | undefined>(undefined);
 
 const GenresProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const [genres, setGenres] = useState<State[]>([]);
@@ -33,11 +33,11 @@ const GenresProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     fetchGenres();
   }, []);
 
-  return <GenresContext.Provider value={{ genres, sessionId, setSessionId }}>{children}</GenresContext.Provider>;
+  return <Context.Provider value={{ genres, sessionId, setSessionId }}>{children}</Context.Provider>;
 };
 
 const useGenres = () => {
-  const context = useContext(GenresContext);
+  const context = useContext(Context);
   if (context) return context;
   throw Error;
 };

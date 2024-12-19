@@ -3,7 +3,7 @@ import { useDebouncedCallback } from 'use-debounce';
 
 import classNames from 'classnames';
 import { format } from 'date-fns';
-import { Pagination, Rate, Alert, Spin, ConfigProvider } from 'antd';
+import { Pagination, Rate, Spin, ConfigProvider, Empty } from 'antd';
 import styles from '../FilmCatalog/FilmCatalog.module.css';
 import { FilmType } from 'type';
 import { useGenres } from '../Context';
@@ -22,8 +22,26 @@ export const GetGuestRate: FC = () => {
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const [pages, setPages] = useState<number>(1);
   const [targetPage, setTargetPage] = useState<number>(1);
-
   const sessionId = sessionStorage.getItem('sessionId');
+
+  useEffect(() => {
+    const storedSessionId = sessionStorage.getItem('sessionId');
+    const previousSessionId = localStorage.getItem('previousSessionId');
+
+    if (storedSessionId !== previousSessionId) {
+      localStorage.removeItem('ratings');
+      localStorage.setItem('previousSessionId', storedSessionId || '');
+      setRatings({});
+    }
+  }, [sessionId]);
+
+  useEffect(() => {
+    const storedRatings = localStorage.getItem('ratings');
+    if (storedRatings) {
+      setRatings(JSON.parse(storedRatings));
+    }
+  }, []);
+
   const handleRateChange = async (filmId: number, value: number) => {
     const isDeleting = value === 0;
     const method = isDeleting ? 'DELETE' : 'POST';
@@ -40,10 +58,22 @@ export const GetGuestRate: FC = () => {
       ...(isDeleting ? {} : { body: JSON.stringify({ value }) }),
     };
 
-    setRatings((prev) => ({
-      ...prev,
-      [filmId]: value,
-    }));
+    setRatings((prev) => {
+      const updatedRatings = { ...prev };
+
+      if (value === 0) {
+    
+        delete updatedRatings[filmId];
+      } else {
+   
+        updatedRatings[filmId] = value;
+      }
+
+   
+      localStorage.setItem('ratings', JSON.stringify(updatedRatings));
+
+      return updatedRatings;
+    });
 
     try {
       const response = await fetch(url, options);
@@ -52,11 +82,10 @@ export const GetGuestRate: FC = () => {
       if (response.ok) {
         console.log('Рейтинг успешно обновлен:', result);
 
-        
-        await MyRateMovie(targetPage); 
+        await MyRateMovie(targetPage);
       } else {
         console.error('Ошибка при обновлении рейтинга:', result.status_message);
-      
+
         setRatings((prev) => ({
           ...prev,
           [filmId]: 0,
@@ -64,7 +93,7 @@ export const GetGuestRate: FC = () => {
       }
     } catch (err) {
       console.error('Ошибка при выполнении запроса:', err);
-   
+
       setRatings((prev) => ({
         ...prev,
         [filmId]: 0,
@@ -89,7 +118,13 @@ export const GetGuestRate: FC = () => {
         options
       );
 
+      if (response.ok === false) {
+        throw new Error(`Ошибка: ${response.status}`);
+      }
+
       if (!response.ok) {
+        console.log(response.status);
+
         throw new Error(`Ошибка: ${response.status}`);
       }
 
@@ -102,8 +137,9 @@ export const GetGuestRate: FC = () => {
         }))
       );
       setPages(films.total_results);
-    } catch (error) {
-      console.error('Ошибка при получении фильмов:', error);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      <Empty />;
     } finally {
       setSearchLoading(false);
     }
@@ -120,7 +156,7 @@ export const GetGuestRate: FC = () => {
   };
 
   if (guestRate.length === 0) {
-    return <Alert message={'нет данных. так как гостевая сессия не загрузилась'} />;
+    return <Empty />;
   }
 
   const myRatesFilms = guestRate.map((film) => {

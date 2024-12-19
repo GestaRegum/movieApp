@@ -27,6 +27,24 @@ const FilmCatalog: FC<SearchType> = ({ query }) => {
   const [hasFilms, setHasFilms] = useState<boolean>(true);
   const sessionId = sessionStorage.getItem('sessionId');
 
+  useEffect(() => {
+    const storedSessionId = sessionStorage.getItem('sessionId');
+    const previousSessionId = localStorage.getItem('previousSessionId');
+
+    if (storedSessionId !== previousSessionId) {
+      localStorage.removeItem('ratings');
+      localStorage.setItem('previousSessionId', storedSessionId || '');
+      setRatings({});
+    }
+  }, [sessionId]);
+
+  useEffect(() => {
+    const storedRatings = localStorage.getItem('ratings');
+    if (storedRatings) {
+      setRatings(JSON.parse(storedRatings));
+    }
+  }, []);
+
   const fetchFilms = useDebouncedCallback((query: string, cur: number) => {
     if (query === '') {
       setPages(1);
@@ -82,10 +100,19 @@ const FilmCatalog: FC<SearchType> = ({ query }) => {
       .then((res) => res.json())
       .catch((err) => console.error(err));
 
-    setRatings((prev) => ({
-      ...prev,
-      [filmId]: value,
-    }));
+    setRatings((prev) => {
+      const updatedRatings = { ...prev };
+
+      if (value === 0) {
+        delete updatedRatings[filmId];
+      } else {
+        updatedRatings[filmId] = value;
+      }
+
+      localStorage.setItem('ratings', JSON.stringify(updatedRatings));
+
+      return updatedRatings;
+    });
   };
 
   const handleToPage = (page: number) => {
@@ -96,51 +123,45 @@ const FilmCatalog: FC<SearchType> = ({ query }) => {
   const filmCatalog = films.map((film) => {
     const filmGenres = film.genre_ids.map((id) => genres.find((genre) => genre.id === id)?.name).filter((name) => name);
     return (
-      <>
-        <div className={classNames(styles.filmConteiner)} key={film.id}>
-          <img
-            className={classNames(styles.poster_path)}
-            src={`${urlImageMovie}${film.poster_path}`}
-            alt={film.title}
-          />
-          <div className={classNames(styles.aboutFilm)}>
-            <div className={classNames(styles.title_popularity)}>
-              <p className={classNames(styles.title)}>{film.title}</p>
-              <p
-                className={classNames(
-                  styles.popularity,
-                  { [styles.popularityFrom0To3]: 0 <= film.vote_average && film.vote_average < 3 },
-                  { [styles.popularityFrom3To5]: 3 <= film.vote_average && film.vote_average < 5 },
-                  { [styles.popularityFrom5To7]: 5 <= film.vote_average && film.vote_average < 7 },
-                  { [styles.popularityFrom7]: 7 <= film.vote_average }
-                )}
-              >
-                {film.vote_average.toFixed(1)}
-              </p>
-            </div>
-            <p className={classNames(styles.release_date)}>
-              {film.release_date ? format(new Date(film.release_date), 'MMMM dd, yyyy') : 'Дата не указана'}
+      <div className={classNames(styles.filmConteiner)} key={film.id}>
+        <img className={classNames(styles.poster_path)} src={`${urlImageMovie}${film.poster_path}`} alt={film.title} />
+        <div className={classNames(styles.aboutFilm)}>
+          <div className={classNames(styles.title_popularity)}>
+            <p className={classNames(styles.title)}>{film.title}</p>
+            <p
+              className={classNames(
+                styles.popularity,
+                { [styles.popularityFrom0To3]: 0 <= film.vote_average && film.vote_average < 3 },
+                { [styles.popularityFrom3To5]: 3 <= film.vote_average && film.vote_average < 5 },
+                { [styles.popularityFrom5To7]: 5 <= film.vote_average && film.vote_average < 7 },
+                { [styles.popularityFrom7]: 7 <= film.vote_average }
+              )}
+            >
+              {film.vote_average.toFixed(1)}
             </p>
-            <div className={styles.genresContainer}>
-              {filmGenres.map((genre) => (
-                <span key={genre} className={classNames(styles.genreTag)}>
-                  {genre}
-                </span>
-              ))}
-            </div>
-            <p className={classNames(styles.overview)}>{miniOverview(film.overview)}</p>
-            <div className={classNames(styles.rate)}>
-              <Rate
-                className={classNames(styles.customRate)}
-                count={10}
-                allowHalf
-                value={ratings[film.id] || 0}
-                onChange={(value) => handleRateChange(film.id, value)}
-              />
-            </div>
+          </div>
+          <p className={classNames(styles.release_date)}>
+            {film.release_date ? format(new Date(film.release_date), 'MMMM dd, yyyy') : 'Дата не указана'}
+          </p>
+          <div className={styles.genresContainer}>
+            {filmGenres.map((genre) => (
+              <span key={genre} className={classNames(styles.genreTag)}>
+                {genre}
+              </span>
+            ))}
+          </div>
+          <p className={classNames(styles.overview)}>{miniOverview(film.overview)}</p>
+          <div className={classNames(styles.rate)}>
+            <Rate
+              className={classNames(styles.customRate)}
+              count={10}
+              allowHalf
+              value={ratings[film.id] || 0}
+              onChange={(value) => handleRateChange(film.id, value)}
+            />
           </div>
         </div>
-      </>
+      </div>
     );
   });
 

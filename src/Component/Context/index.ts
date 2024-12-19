@@ -1,3 +1,3 @@
-import { GenresProvider, useGenres } from './GenresContext';
+import { GenresProvider, useGenres } from './Context';
 
 export { GenresProvider, useGenres };
