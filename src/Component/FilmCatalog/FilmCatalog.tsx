@@ -17,6 +17,8 @@ function miniOverview(text: string, length = 60): string {
   return text.slice(0, text.indexOf(' ', length)) + '...';
 }
 
+
+
 const FilmCatalog: FC<SearchType> = ({ query }) => {
   const { genres } = useGenres();
   const [films, setFilms] = useState<FilmType[]>([]);
@@ -131,10 +133,10 @@ const FilmCatalog: FC<SearchType> = ({ query }) => {
             <p
               className={classNames(
                 styles.popularity,
-                { [styles.popularityFrom0To3]: 0 <= film.vote_average && film.vote_average < 3 },
-                { [styles.popularityFrom3To5]: 3 <= film.vote_average && film.vote_average < 5 },
-                { [styles.popularityFrom5To7]: 5 <= film.vote_average && film.vote_average < 7 },
-                { [styles.popularityFrom7]: 7 <= film.vote_average }
+                { [styles.popularityFrom7]: 7 <= film.vote_average },
+                { [styles.popularityFrom5To7]: 5 <= film.vote_average },
+                { [styles.popularityFrom3To5]: 3 <= film.vote_average },
+                { [styles.popularityFrom0To3]: 0 <= film.vote_average }
               )}
             >
               {film.vote_average.toFixed(1)}
