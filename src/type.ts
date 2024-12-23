@@ -1,4 +1,4 @@
-export interface FilmType {
+interface Movie {
   id: number;
   title: string;
   overview: string;
@@ -9,6 +9,13 @@ export interface FilmType {
   rating?: number;
 }
 
-export interface SearchType {
+interface Search {
   query: string;
 }
+
+interface Genres {
+  id: number;
+  name: string;
+}
+
+export type { Movie, Search, Genres };

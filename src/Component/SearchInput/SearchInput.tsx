@@ -15,7 +15,9 @@ const SearchMenu: FC<SearchProps> = ({ onSearch }) => {
     [onSearch]
   );
 
-  return <input className={classNames(styles)} type="text" onChange={handleChange} placeholder="Type to search..." />;
+  return (
+    <input className={classNames(styles)} type={'text'} onChange={handleChange} placeholder={'Type to search...'} />
+  );
 };
 
 export { SearchMenu };

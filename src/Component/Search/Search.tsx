@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { FilmCatalog } from '../FilmCatalog';
+import { MovieCatalog } from '../MovieCatalog';
 import { SearchMenu } from '../SearchInput';
 import { ErrorBoundary } from '../ErrorBoundary';
 
@@ -9,11 +9,12 @@ const Search: FC = () => {
   const handleSearch = (text: string) => {
     setQuery(text);
   };
+
   return (
     <>
       <ErrorBoundary>
         <SearchMenu onSearch={handleSearch} />
-        <FilmCatalog query={query} />
+        <MovieCatalog query={query} />
       </ErrorBoundary>
     </>
   );

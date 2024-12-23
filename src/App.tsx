@@ -3,18 +3,16 @@ import { Search } from './Component/Search';
 import { ErrorBoundary } from './Component/ErrorBoundary';
 import { GetGuestRate } from './Component/GetGuestRate';
 import { Route, Routes } from 'react-router-dom';
-import { NetWork } from './Component/NetWork';
-import { GuestAPI } from './Component/GuestAPI';
+import { NetworkAlert } from './Component/NetWorkAlert';
 
 const App: FC = () => {
   return (
     <>
       <ErrorBoundary>
-        <GuestAPI />
-        <NetWork />
+        <NetworkAlert />
         <Routes>
-          <Route path="/rates" element={<GetGuestRate />} />
-          <Route path="/" element={<Search />} />
+          <Route path={'/rates'} element={<GetGuestRate />} />
+          <Route path={'/'} element={<Search />} />
         </Routes>
       </ErrorBoundary>
     </>

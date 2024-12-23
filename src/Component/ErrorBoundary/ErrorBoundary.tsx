@@ -1,18 +1,9 @@
 import { Alert } from 'antd';
-
 import React from 'react';
+import { Props, State } from './type';
 
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
-}
-
-interface ErrorBoundaryProps {
-  children: React.ReactNode;
-}
-
-export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
+class ErrorBoundary extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props);
     this.state = { hasError: false, error: null };
   }
@@ -28,7 +19,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     if (hasError) {
       return (
         <>
-          <Alert message={error?.message} type="error" />
+          <Alert message={error?.message} type={'error'} />
         </>
       );
     }
@@ -36,3 +27,5 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     return this.props.children;
   }
 }
+
+export { ErrorBoundary };

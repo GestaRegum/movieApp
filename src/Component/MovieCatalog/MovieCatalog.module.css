@@ -1,13 +1,14 @@
 @media (min-width: 769px) {
-  .filmCatalog {
+  .movieCatalog {
     display: grid;
     grid-template-columns: 1fr 1fr;
     row-gap: 33px;
     column-gap: 36px;
     justify-items: center;
+    padding-top: 30px;
   }
 
-  .filmConteiner {
+  .movieConteiner {
     color: white;
     width: 454px;
     height: 281px;
@@ -62,12 +63,12 @@
     text-align: left;
   }
 
-  .aboutFilm {
+  .aboutMovie {
     display: grid;
     justify-items: start;
   }
 
-  .aboutFilm .title_popularity {
+  .aboutMovie .title_popularity {
     display: flex;
     justify-content: space-between;
     padding-right: 10px;
@@ -97,14 +98,16 @@
 }
 
 @media (max-width: 769px) {
-  .filmCatalog {
+  .movieCatalog {
     display: grid;
     row-gap: 33px;
     column-gap: 36px;
     justify-items: center;
+    padding-top: 30px;
+  
   }
 
-  .filmConteiner {
+  .movieConteiner {
     color: white;
     width: 387px;
     height: 245px;
@@ -162,7 +165,7 @@
     text-align: left;
   }
 
-  .aboutFilm .title_popularity {
+  .aboutMovie .title_popularity {
     margin: 0;
     display: flex;
     justify-content: space-between;

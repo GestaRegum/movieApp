@@ -1,29 +1,32 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { FC, useEffect, useState } from 'react';
-import { useDebouncedCallback } from 'use-debounce';
-import { useNetworkState } from 'react-use';
-import classNames from 'classnames';
 import { format } from 'date-fns';
-import { Pagination, Rate, Spin, ConfigProvider, Empty } from 'antd';
-import { fetchRatedMovies, rateMovie } from '../WorkWithAPI/apiService';
-import styles from '../MovieCatalog/MovieCatalog.module.css';
-import { Movie, Genres } from 'type';
+import { Genres, Movie, Search } from 'type';
+import { Spin, Pagination, Rate, Alert, ConfigProvider } from 'antd';
+import { useDebouncedCallback } from 'use-debounce';
+import { searchMovies, rateMovie } from '../WorkWithAPI/apiService';
 import { urlImageMovie } from '../WorkWithAPI/urlAndOptions';
+import { useGuestAPI } from '../MyHooks';
+import { useNetworkState } from 'react-use';
+import styles from './MovieCatalog.module.css';
+import classNames from 'classnames';
 
 function miniOverview(text: string, length = 60): string {
   if (text.length <= length) return text;
   return text.slice(0, text.indexOf(' ', length)) + '...';
 }
 
-const GetGuestRate: FC = () => {
-  const [guestRate, setGuestRate] = useState<Movie[]>([]);
-  const [ratings, setRatings] = useState<Record<number, number>>({});
+const MovieCatalog: FC<Search> = ({ query }) => {
+  const [movies, setMovies] = useState<Movie[]>([]);
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const [pages, setPages] = useState<number>(1);
   const [targetPage, setTargetPage] = useState<number>(1);
+  const [ratings, setRatings] = useState<Record<number, number>>({});
+  const [hasMovies, setHasMovies] = useState<boolean>(true);
   const genresFromLocalStorage = JSON.parse(localStorage.getItem('genres') || '[]');
-  const sessionId = sessionStorage.getItem('sessionId');
   const isOnline = useNetworkState();
+  const sessionId = sessionStorage.getItem('sessionId');
+
+  useGuestAPI();
 
   useEffect(() => {
     const storedSessionId = sessionStorage.getItem('sessionId');
@@ -43,11 +46,49 @@ const GetGuestRate: FC = () => {
     }
   }, []);
 
+  const fetchMovies = useDebouncedCallback(async (query: string, cur: number) => {
+    if (query === '') {
+      setPages(1);
+      setMovies([]);
+      setTargetPage(1);
+      setSearchLoading(false);
+      return;
+    }
+
+    try {
+      setMovies([]);
+      setSearchLoading(true);
+
+      const movieData = await searchMovies(query, cur);
+
+      if (movieData.total_results === 0) {
+        setPages(1);
+        setMovies([]);
+        setSearchLoading(false);
+        setHasMovies(false);
+        return;
+      }
+
+      setHasMovies(true);
+      setPages(movieData.total_results);
+      setMovies(movieData.results);
+    } catch (error) {
+      console.error('Ошибка при загрузке фильмов:', error);
+    } finally {
+      setSearchLoading(false);
+    }
+  }, 2000);
+
+  useEffect(() => {
+    fetchMovies(query, targetPage);
+  }, [query, targetPage, fetchMovies]);
+
   const handleRateChange = (movieId: number) => async (value: number) => {
-    if (!isOnline.online) return null;
+    if (!isOnline.online) return;
 
     try {
       await rateMovie(movieId, sessionId, value);
+
       setRatings((prev) => {
         const updatedRatings = { ...prev };
 
@@ -61,51 +102,28 @@ const GetGuestRate: FC = () => {
         return updatedRatings;
       });
     } catch (error) {
-      console.error(error);
+      console.error('Ошибка при оценке фильма:', error);
     }
   };
-
-  const MyRateMovie = useDebouncedCallback(async (page: number) => {
-    try {
-      setSearchLoading(true);
-      const movies = await fetchRatedMovies(sessionId, page);
-
-      setGuestRate(
-        movies.results.map((movie: Movie) => ({
-          ...movie,
-          rating: ratings[movie.id] || movie.rating || 0,
-        }))
-      );
-      setPages(movies.total_results);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setSearchLoading(false);
-    }
-  }, 1000);
-
-  useEffect(() => {
-    MyRateMovie(targetPage);
-  }, [targetPage]);
 
   const handleToPage = (page: number) => {
     setTargetPage(page);
-    MyRateMovie(page);
+    fetchMovies(query, page);
   };
 
-  if (guestRate.length === 0) {
-    return <Empty />;
-  }
+  const movieCatalog = movies.map((movie) => {
+    const movieGenres = movie.genre_ids
+      .map((id) => genresFromLocalStorage.find((genre: Genres) => genre.id === id)?.name)
+      .filter((name) => name);
 
-  const myRatesMovies = guestRate.map((movie) => {
     return (
-      <div className={styles.movieConteiner} key={movie.id}>
+      <div className={classNames(styles.movieConteiner)} key={movie.id}>
         <img
           className={classNames(styles.poster_path)}
           src={`${urlImageMovie}${movie.poster_path}`}
           alt={movie.title}
         />
-        <div className={styles.aboutMovie}>
+        <div className={classNames(styles.aboutMovie)}>
           <div className={classNames(styles.title_popularity)}>
             <p className={classNames(styles.title)}>{movie.title}</p>
             <p
@@ -124,23 +142,22 @@ const GetGuestRate: FC = () => {
             {movie.release_date ? format(new Date(movie.release_date), 'MMMM dd, yyyy') : 'Дата не указана'}
           </p>
           <div className={styles.genresContainer}>
-            {movie.genre_ids
-              .map((id) => genresFromLocalStorage.find((genre: Genres) => genre.id === id)?.name)
-              .filter((name) => name)
-              .map((genre) => (
-                <span key={genre} className={classNames(styles.genreTag)}>
-                  {genre}
-                </span>
-              ))}
+            {movieGenres.map((genre) => (
+              <span key={genre} className={classNames(styles.genreTag)}>
+                {genre}
+              </span>
+            ))}
           </div>
           <p className={classNames(styles.overview)}>{miniOverview(movie.overview)}</p>
-          <Rate
-            style={{ fontSize: 15 }}
-            count={10}
-            allowHalf
-            value={movie.rating}
-            onChange={handleRateChange(movie.id)}
-          />
+          <div className={classNames(styles.rate)}>
+            <Rate
+              className={classNames(styles.customRate)}
+              count={10}
+              allowHalf
+              value={ratings[movie.id] || 0}
+              onChange={handleRateChange(movie.id)}
+            />
+          </div>
         </div>
       </div>
     );
@@ -148,9 +165,10 @@ const GetGuestRate: FC = () => {
 
   return (
     <>
-      <div className={styles.movieCatalog}>{guestRate.length > 0 ? myRatesMovies : null}</div>
-      {searchLoading ? <Spin /> : null}
-      {myRatesMovies.length === 0 ? null : (
+      {!hasMovies && <Alert message={'Такой фильм еще не сняли :('} />}
+      <div className={styles.movieCatalog}>{movieCatalog}</div>
+      {searchLoading && <Spin size={'large'} />}
+      {movieCatalog.length > 0 && (
         <ConfigProvider
           theme={{
             token: {
@@ -178,4 +196,4 @@ const GetGuestRate: FC = () => {
   );
 };
 
-export { GetGuestRate };
+export { MovieCatalog };
