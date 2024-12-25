@@ -1,15 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
-import { optionsApiForGet } from '../WorkWithAPI/urlAndOptions';
+import { guestSessionUrl, optionsApiForGet } from '../../Utils/MyApiForFetchingDifferentDataAboutMoviesFromServer/urlAndOptions';
 
-const guestSessionUrl: string = 'https://api.themoviedb.org/3/authentication/guest_session/new';
 
 interface State {
   guest_session_id: string;
   success: boolean;
 }
 
-const useGuestAPI = () => {
+export const useGuestAPI = () => {
   const [sessionId, setSessionId] = useState<string>('');
 
   const getGuestSessionId = async (): Promise<void> => {
@@ -43,5 +42,3 @@ const useGuestAPI = () => {
 
   return null;
 };
-
-export { useGuestAPI };

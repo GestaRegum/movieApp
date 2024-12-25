@@ -2,17 +2,17 @@ import { Link } from 'react-router-dom';
 import styles from './Header.module.css';
 import classNames from 'classnames';
 
-const Header = () => {
+export const Header = () => {
   return (
     <nav className={classNames(styles)}>
       <div>
-        <Link to={'/'}>Search</Link>
+        <Link to='/'>Search</Link>
       </div>
       <div>
-        <Link to={'/rates'}>Rates</Link>
+        <Link to='/rates'>Rates</Link>
       </div>
     </nav>
   );
 };
 
-export { Header };
+

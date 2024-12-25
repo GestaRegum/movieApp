@@ -7,7 +7,7 @@ interface SearchProps {
   onSearch: (text: string) => void;
 }
 
-const SearchMenu: FC<SearchProps> = ({ onSearch }) => {
+export const SearchInput: FC<SearchProps> = ({ onSearch }) => {
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       onSearch(e.target.value);
@@ -16,8 +16,8 @@ const SearchMenu: FC<SearchProps> = ({ onSearch }) => {
   );
 
   return (
-    <input className={classNames(styles)} type={'text'} onChange={handleChange} placeholder={'Type to search...'} />
+    <input className={classNames(styles)} type='text' onChange={handleChange} placeholder='Type to search...' />
   );
 };
 
-export { SearchMenu };
+

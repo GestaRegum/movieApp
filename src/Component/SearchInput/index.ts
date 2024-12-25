@@ -1,3 +1,3 @@
-import { SearchMenu } from './SearchInput';
+import { SearchInput } from './SearchInput';
 
-export { SearchMenu };
+export { SearchInput };

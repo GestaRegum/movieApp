@@ -7,8 +7,8 @@ import {
   urlForSearchMovie,
 } from './urlAndOptions';
 
-const fetchRatedMovies = async (sessionId: string | null, page: number) => {
-  if (!sessionId) return <Alert message={'сессия не найдена'} />;
+export const fetchRatedMovies = async (sessionId: string | null, page: number) => {
+  if (!sessionId) return <Alert message='сессия не найдена' />;
 
   const response = await fetch(urlForMyRateMovie(sessionId, page), optionsApiForGet);
 
@@ -19,8 +19,8 @@ const fetchRatedMovies = async (sessionId: string | null, page: number) => {
   return response.json();
 };
 
-const rateMovie = async (movieId: number, sessionId: string | null, value: number) => {
-  if (!sessionId) return <Alert message={'сессия не найдена'} />;
+export const rateMovie = async (movieId: number, sessionId: string | null, value: number) => {
+  if (!sessionId) return <Alert message='сессия не найдена' />;
 
   const response = await fetch(urlForRating(movieId, sessionId), optionsForRating(value));
 
@@ -31,7 +31,7 @@ const rateMovie = async (movieId: number, sessionId: string | null, value: numbe
   return response.json();
 };
 
-const searchMovies = async (query: string, page: number) => {
+export const searchMovies = async (query: string, page: number) => {
   const response = await fetch(urlForSearchMovie(query, page), optionsApiForGet);
 
   if (!response.ok) {
@@ -41,4 +41,3 @@ const searchMovies = async (query: string, page: number) => {
   return response.json();
 };
 
-export { rateMovie, fetchRatedMovies, searchMovies };
