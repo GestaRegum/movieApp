@@ -1,7 +1,7 @@
-import { FC } from 'react';
+import React, { FC } from 'react';
 import { Search } from './Component/Search';
 import { ErrorBoundary } from './Utils/ErrorBoundary';
-import { MovieList } from './Component/MovieList';
+import { MovieList } from './Component/MovieListSessionRate';
 import { Route, Routes } from 'react-router-dom';
 import { NetworkAlert } from './Utils/NetWorkAlert';
 

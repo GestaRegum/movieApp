@@ -1,9 +1,8 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { Pagination, Spin, ConfigProvider, Empty } from 'antd';
 import { fetchRatedMovies } from '../../Utils/MyApiForFetchingDifferentDataAboutMoviesFromServer/API';
-import styles from '../../Component/MovieCatalog/MovieCatalog.module.css';
+import styles from './MovieList.module.css';
 import { Movie } from 'type';
 import { MovieCard } from '../MovieCard';
 
@@ -88,7 +87,7 @@ export const MovieList: FC = () => {
             current={targetPage}
             onChange={handleToPage}
             defaultPageSize={20}
-            align='center'
+            align="center"
             showSizeChanger={false}
             defaultCurrent={1}
             total={pages}

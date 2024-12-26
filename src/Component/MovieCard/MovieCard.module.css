@@ -1,0 +1,198 @@
+@media (min-width: 769px) {
+  .movieCatalog {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 33px;
+    column-gap: 36px;
+    justify-items: center;
+    padding-top: 30px;
+  }
+
+  .movieConteiner {
+    color: white;
+    width: 454px;
+    height: 281px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background-color: rgba(26, 26, 25, 0.7);
+    border-radius: 10px;
+  }
+  .poster_path {
+    height: 281px;
+    width: 183px;
+    border-radius: 10px 0 0 10px;
+  }
+  .popularity {
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+    border-radius: 50%;
+  }
+
+  .popularityFrom0To3 {
+    border: 2px solid #e90000;
+  }
+
+  .popularityFrom3To5 {
+    border: 2px solid #e97e00;
+  }
+
+  .popularityFrom5To7 {
+    border: 2px solid #e9d100;
+  }
+
+  .popularityFrom7 {
+    border: 2px solid #66e900;
+  }
+
+  .title {
+    width: 200px;
+    font-size: 16px;
+    text-align: left;
+  }
+  .release_date {
+    font-size: 12px;
+  }
+  .overview {
+    width: 228px;
+    padding-right: 10px;
+    overflow: hidden;
+    text-align: left;
+  }
+
+  .aboutMovie {
+    display: grid;
+    justify-items: start;
+  }
+
+  .aboutMovie .title_popularity {
+    display: flex;
+    justify-content: space-between;
+    padding-right: 10px;
+    align-items: center;
+  }
+
+  .genresContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-content: center;
+  }
+
+  .genreTag {
+    display: inline-flex;
+    padding: 4px 10px;
+    border-radius: 2px;
+    font-size: 12px;
+    font-weight: 400;
+    color: white;
+    background-color: rgb(24, 144, 255);
+  }
+
+  .customRate {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 769px) {
+  .movieCatalog {
+    display: grid;
+    row-gap: 33px;
+    column-gap: 36px;
+    justify-items: center;
+    padding-top: 30px;
+  
+  }
+
+  .movieConteiner {
+    color: white;
+    width: 387px;
+    height: 245px;
+    display: flex;
+    background-color: rgba(26, 26, 25, 0.7);
+    gap: 10px;
+  }
+  .poster_path {
+    padding-left: 11px;
+    padding-top: 8px;
+    height: 91px;
+    width: 60px;
+  }
+  .popularity {
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+    border-radius: 50%;
+  }
+
+  .popularityFrom0To3 {
+    border: 2px solid #e90000;
+  }
+
+  .popularityFrom3To5 {
+    border: 2px solid #e97e00;
+  }
+
+  .popularityFrom5To7 {
+    border: 2px solid #e9d100;
+  }
+
+  .popularityFrom7 {
+    border: 2px solid #66e900;
+  }
+
+  .title {
+    margin: 0;
+    font-size: 20px;
+    text-align: left;
+  }
+  .release_date {
+    margin: 0;
+    font-size: 12px;
+    text-align: left;
+  }
+  .overview {
+    padding-top: 19px;
+    padding-right: 10px;
+    margin: 0;
+    font-size: 12px;
+    text-align: left;
+  }
+
+  .aboutMovie .title_popularity {
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    padding-right: 10px;
+    align-items: center;
+  }
+
+  .genresContainer {
+    padding-top: 7px;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .genreTag {
+    margin: 0;
+    display: inline-flex;
+    padding: 4px 10px;
+    border-radius: 2px;
+    font-size: 12px;
+    font-weight: 400;
+    color: white;
+    background-color: rgb(24, 144, 255);
+  }
+
+  .rate {
+    padding-top: 50px;
+  }
+}

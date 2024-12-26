@@ -1,3 +1,4 @@
+import React from 'react';
 import { Alert } from 'antd';
 import {
   optionsApiForGet,
@@ -8,7 +9,7 @@ import {
 } from './urlAndOptions';
 
 export const fetchRatedMovies = async (sessionId: string | null, page: number) => {
-  if (!sessionId) return <Alert message='сессия не найдена' />;
+  if (!sessionId) return <Alert message="сессия не найдена" />;
 
   const response = await fetch(urlForMyRateMovie(sessionId, page), optionsApiForGet);
 
@@ -20,7 +21,7 @@ export const fetchRatedMovies = async (sessionId: string | null, page: number) =
 };
 
 export const rateMovie = async (movieId: number, sessionId: string | null, value: number) => {
-  if (!sessionId) return <Alert message='сессия не найдена' />;
+  if (!sessionId) return <Alert message="сессия не найдена" />;
 
   const response = await fetch(urlForRating(movieId, sessionId), optionsForRating(value));
 
@@ -40,4 +41,3 @@ export const searchMovies = async (query: string, page: number) => {
 
   return response.json();
 };
-

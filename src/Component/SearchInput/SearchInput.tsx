@@ -1,23 +1,17 @@
-import { FC, ChangeEvent, useCallback } from 'react';
-
+import React, { FC } from 'react';
+import { useSearchQuery } from '../../Utils/hooks';
 import styles from './SearchInput.module.css';
 import classNames from 'classnames';
 
-interface SearchProps {
-  onSearch: (text: string) => void;
-}
-
-export const SearchInput: FC<SearchProps> = ({ onSearch }) => {
-  const handleChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      onSearch(e.target.value);
-    },
-    [onSearch]
-  );
-
+export const SearchInput: FC = () => {
+  const { handleChange, query } = useSearchQuery();
   return (
-    <input className={classNames(styles)} type='text' onChange={handleChange} placeholder='Type to search...' />
+    <input
+      className={classNames(styles)}
+      type="text"
+      value={query}
+      onChange={handleChange}
+      placeholder="Type to search..."
+    />
   );
 };
-
-

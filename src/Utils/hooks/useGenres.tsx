@@ -1,5 +1,5 @@
-/* eslint-disable react-refresh/only-export-components */
-import { FC, ReactNode, createContext, useContext, useEffect, useState } from 'react';
+
+import React, { FC, ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import {
   optionsApiForGet,
   urlForGenres,

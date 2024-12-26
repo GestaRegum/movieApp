@@ -1,18 +1,19 @@
-import { FC, useEffect, useState } from 'react';
-import { Movie, Search } from 'type';
+import React, { FC, useEffect, useState } from 'react';
+import { Movie } from 'type';
 import { Spin, Pagination, Alert, ConfigProvider } from 'antd';
 import { useDebouncedCallback } from 'use-debounce';
 import { searchMovies } from '../../Utils/MyApiForFetchingDifferentDataAboutMoviesFromServer/API';
-import { useGuestAPI } from '../../Utils/hooks';
+import { useGuestAPI, useSearchQuery } from '../../Utils/hooks';
 import styles from './MovieCatalog.module.css';
-import { MovieCard } from '../MovieCard/MovieCard';
+import { MovieCard } from '../MovieCard';
 
-export const MovieCatalog: FC<Search> = ({ query }) => {
+export const MovieCatalog: FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const [pages, setPages] = useState<number>(1);
   const [targetPage, setTargetPage] = useState<number>(1);
   const [hasMovies, setHasMovies] = useState<boolean>(true);
+  const { query } = useSearchQuery();
 
   useGuestAPI();
 

@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from 'react';
+
+import  { useEffect, useState } from 'react';
 import { guestSessionUrl, optionsApiForGet } from '../../Utils/MyApiForFetchingDifferentDataAboutMoviesFromServer/urlAndOptions';
 
 
