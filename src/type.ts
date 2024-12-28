@@ -9,10 +9,6 @@ interface Movie {
   rating?: number;
 }
 
-interface onMovies {
-  onMovies: Movie[];
-}
-
 interface Search {
   query: string;
 }
@@ -22,4 +18,4 @@ interface Genres {
   name: string;
 }
 
-export type { Movie, Search, Genres, onMovies };
+export type { Movie, Search, Genres };

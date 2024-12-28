@@ -7,8 +7,14 @@ import { Genres, Movie } from 'type';
 export const useMovieCartAndChangeRate = () => {
   const [ratings, setRatings] = useState<Record<number, number>>({});
   const isOnline = useNetworkState();
-  const sessionId = sessionStorage.getItem('sessionId');
   const { genres } = useGenres();
+
+  useEffect(() => {
+    const savedRatings = localStorage.getItem('ratings');
+    if (savedRatings) {
+      setRatings(JSON.parse(savedRatings));
+    }
+  }, []);
 
   const movieGenresFilter = (movie: Movie) => {
     return movie.genre_ids.map((id) => genres.find((genre: Genres) => genre.id === id)?.name).filter((name) => name);
@@ -19,29 +25,10 @@ export const useMovieCartAndChangeRate = () => {
     return text.slice(0, text.indexOf(' ', length)) + '...';
   };
 
-  useEffect(() => {
-    const storedRatings = localStorage.getItem('ratings');
-    if (storedRatings) {
-      setRatings(JSON.parse(storedRatings));
-    }
-  }, []);
-
-  useEffect(() => {
-    const storedSessionId = sessionStorage.getItem('sessionId');
-    const previousSessionId = localStorage.getItem('previousSessionId');
-
-    if (storedSessionId !== previousSessionId) {
-      localStorage.removeItem('ratings');
-      localStorage.setItem('previousSessionId', storedSessionId || '');
-      setRatings({});
-    }
-  }, [sessionId]);
-
   const handleRateChange = (movieId: number) => async (value: number) => {
     if (!isOnline.online) return;
-
     try {
-      await rateMovie(movieId, sessionId, value);
+      await rateMovie(movieId, value);
 
       setRatings((prev) => {
         const updatedRatings = { ...prev };
@@ -53,6 +40,7 @@ export const useMovieCartAndChangeRate = () => {
         }
 
         localStorage.setItem('ratings', JSON.stringify(updatedRatings));
+
         return updatedRatings;
       });
     } catch (error) {

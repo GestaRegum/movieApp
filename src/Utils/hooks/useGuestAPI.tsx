@@ -1,7 +1,8 @@
-
-import  { useEffect, useState } from 'react';
-import { guestSessionUrl, optionsApiForGet } from '../../Utils/MyApiForFetchingDifferentDataAboutMoviesFromServer/urlAndOptions';
-
+import { useEffect, useState } from 'react';
+import {
+  guestSessionUrl,
+  optionsApiForGet,
+} from '../../Utils/MyApiForFetchingDifferentDataAboutMoviesFromServer/urlAndOptions';
 
 interface State {
   guest_session_id: string;
@@ -23,6 +24,7 @@ export const useGuestAPI = () => {
 
       if (data.success) {
         sessionStorage.setItem('sessionId', data.guest_session_id);
+        localStorage.setItem('previousSessionId', data.guest_session_id);
       } else {
         throw new Error('Ошибка при загрузке гостевой сессии');
       }

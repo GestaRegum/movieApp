@@ -8,7 +8,9 @@ import {
   urlForSearchMovie,
 } from './urlAndOptions';
 
-export const fetchRatedMovies = async (sessionId: string | null, page: number) => {
+const sessionId = sessionStorage.getItem('sessionId');
+
+export const fetchRatedMovies = async (page: number) => {
   if (!sessionId) return <Alert message="сессия не найдена" />;
 
   const response = await fetch(urlForMyRateMovie(sessionId, page), optionsApiForGet);
@@ -20,7 +22,7 @@ export const fetchRatedMovies = async (sessionId: string | null, page: number) =
   return response.json();
 };
 
-export const rateMovie = async (movieId: number, sessionId: string | null, value: number) => {
+export const rateMovie = async (movieId: number, value: number) => {
   if (!sessionId) return <Alert message="сессия не найдена" />;
 
   const response = await fetch(urlForRating(movieId, sessionId), optionsForRating(value));
@@ -28,7 +30,6 @@ export const rateMovie = async (movieId: number, sessionId: string | null, value
   if (!response.ok) {
     return <Alert message={`Ошибка: ${response.status}`} />;
   }
-
   return response.json();
 };
 

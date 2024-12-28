@@ -1,63 +1,15 @@
-import React, { FC, useEffect, useState } from 'react';
-import { Movie } from 'type';
+import React, { FC } from 'react';
+
 import { Spin, Pagination, Alert, ConfigProvider } from 'antd';
-import { useDebouncedCallback } from 'use-debounce';
-import { searchMovies } from '../../Utils/MyApiForFetchingDifferentDataAboutMoviesFromServer/API';
-import { useGuestAPI, useSearchQuery } from '../../Utils/hooks';
+
+import { useFoundMovies, useGuestAPI } from '../../Utils/hooks';
 import styles from './MovieCatalog.module.css';
 import { MovieCard } from '../MovieCard';
 
 export const MovieCatalog: FC = () => {
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [searchLoading, setSearchLoading] = useState<boolean>(false);
-  const [pages, setPages] = useState<number>(1);
-  const [targetPage, setTargetPage] = useState<number>(1);
-  const [hasMovies, setHasMovies] = useState<boolean>(true);
-  const { query } = useSearchQuery();
+  const { handleToPage, movies, searchLoading, pages, hasMovies, targetPage } = useFoundMovies();
 
   useGuestAPI();
-
-  const fetchMovies = useDebouncedCallback(async (query: string, cur: number) => {
-    if (query === '') {
-      setPages(1);
-      setMovies([]);
-      setTargetPage(1);
-      setSearchLoading(false);
-      return;
-    }
-
-    try {
-      setMovies([]);
-      setSearchLoading(true);
-
-      const movieData = await searchMovies(query, cur);
-
-      if (movieData.total_results === 0) {
-        setPages(1);
-        setMovies([]);
-        setSearchLoading(false);
-        setHasMovies(false);
-        return;
-      }
-
-      setHasMovies(true);
-      setPages(movieData.total_results);
-      setMovies(movieData.results);
-    } catch (error) {
-      console.error('Ошибка при загрузке фильмов:', error);
-    } finally {
-      setSearchLoading(false);
-    }
-  }, 2000);
-
-  useEffect(() => {
-    fetchMovies(query, targetPage);
-  }, [query, targetPage, fetchMovies]);
-
-  const handleToPage = (page: number) => {
-    setTargetPage(page);
-    fetchMovies(query, page);
-  };
 
   return (
     <>

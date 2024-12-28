@@ -1,3 +1,3 @@
-import { MovieList } from "./MovieListSessionRate";
+import { MovieListSessionRate } from "./MovieListSessionRate";
 
-export {MovieList}
+export {MovieListSessionRate}

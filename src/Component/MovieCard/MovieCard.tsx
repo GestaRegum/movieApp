@@ -50,7 +50,7 @@ export const MovieCard: FC<{ Movies: Movie[] }> = ({ Movies }) => {
               className={classNames(styles.customRate)}
               count={10}
               allowHalf
-              value={movie.rating ? movie.rating : ratings[movie.id] || 0}
+              value={ratings[movie.id] || 0}
               onChange={handleRateChange(movie.id)}
             />
           </div>
