@@ -4,7 +4,7 @@ import { Spin, Pagination, Alert, ConfigProvider } from 'antd';
 
 import { useFoundMovies, useGuestAPI } from '../../Utils/hooks';
 import styles from './MovieCatalog.module.css';
-import { MovieCard } from '../MovieCard';
+import { MovieList } from '../MovieList';
 
 export const MovieCatalog: FC = () => {
   const { handleToPage, movies, searchLoading, pages, hasMovies, targetPage } = useFoundMovies();
@@ -17,7 +17,7 @@ export const MovieCatalog: FC = () => {
         <Alert message="Такой фильм еще не сняли :(" />
       ) : (
         <div className={styles.movieCatalog}>
-          <MovieCard Movies={movies} />
+          <MovieList movies={movies} />
         </div>
       )}
 

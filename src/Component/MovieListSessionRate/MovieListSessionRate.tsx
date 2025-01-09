@@ -1,21 +1,19 @@
 import React, { FC } from 'react';
 import { Pagination, Spin, ConfigProvider, Empty } from 'antd';
 import { useRatedMovies } from '../../Utils/hooks/useRatedMovies';
-import styles from './MovieList.module.css';
-import { MovieCard } from '../MovieCard';
+import styles from './MovieListSessionRate.module.css';
+import { MovieList } from '../MovieList';
 import { useGuestAPI } from '../../Utils/hooks';
 
 export const MovieListSessionRate: FC = () => {
   const { movies, loading, totalPages, handleToPage, targetPage } = useRatedMovies();
   useGuestAPI();
 
-  if (movies.length === 0 && !loading) {
-    return <Empty />;
-  }
+  if (movies.length === 0 && !loading) return <Empty />;
 
   return (
     <>
-      <div className={styles.movieCatalog}>{movies.length > 0 ? <MovieCard Movies={movies} /> : null}</div>
+      <div className={styles.movieCatalog}>{movies.length > 0 ? <MovieList movies={movies} /> : null}</div>
       {loading ? <Spin /> : null}
       {movies.length > 1 ? (
         <ConfigProvider

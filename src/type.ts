@@ -9,6 +9,10 @@ interface Movie {
   rating?: number;
 }
 
+interface MovieCardType {
+  movie: Movie
+}
+
 interface Search {
   query: string;
 }
@@ -18,4 +22,4 @@ interface Genres {
   name: string;
 }
 
-export type { Movie, Search, Genres };
+export type { Movie, Search, Genres, MovieCardType };
